@@ -1,5 +1,4 @@
-name: Extract InspectAI Redesign
-
+name: InspectAI Redesign Extractor
 on:
   push:
     paths:
