@@ -1,6 +1,9 @@
 name: Extract InspectAI Redesign
 
 on:
+  push:
+    paths:
+      - 'inspectai-ui-redesign.zip'
   workflow_dispatch:
 
 permissions:
@@ -8,11 +11,17 @@ permissions:
 
 jobs:
   extract:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Check ZIP
+        run: |
+          ls -lh inspectai-ui-redesign.zip
+          unzip -l inspectai-ui-redesign.zip | head -30
 
       - name: Extract redesign
         run: |
@@ -22,6 +31,7 @@ jobs:
           ROOT=$(find /tmp/inspectai -name package.json -print -quit | xargs dirname)
 
           echo "Project root: $ROOT"
+
           cp -R "$ROOT"/. .
 
       - name: Commit redesigned project
@@ -29,7 +39,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add app supabase package.json tsconfig.json next-env.d.ts SETUP.md
+          git add -A
 
           git commit -m "Apply InspectAI UI redesign" || exit 0
+
           git push
