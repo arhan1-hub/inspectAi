@@ -27,3 +27,4 @@ jobs:
           git add .
           git commit -m "Extract InspectAI V4 project" || exit 0
           git push
+          
