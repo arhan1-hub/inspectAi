@@ -1,0 +1,30 @@
+name: Extract InspectAI
+
+on:
+  push:
+    paths:
+      - "inspectai-mvp-v4.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract project
+        run: |
+          unzip -o inspectai-mvp-v4.zip -d /tmp/inspectai
+          cp -r /tmp/inspectai/* .
+          rm -f inspectai-mvp-v4.zip
+          rm -f app/page.v3.tsx
+
+      - name: Commit project files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Extract InspectAI V4 project" || exit 0
+          git push
