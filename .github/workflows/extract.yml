@@ -2,8 +2,7 @@ name: Extract InspectAI
 
 on:
   push:
-    paths:
-      - "inspectai-mvp-v4.zip"
+  workflow_dispatch:
 
 permissions:
   contents: write
