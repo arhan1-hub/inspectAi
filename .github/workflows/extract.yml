@@ -11,28 +11,35 @@ permissions:
 
 jobs:
   extract:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check ZIP
-        run: |
-          ls -lh inspectai-ui-redesign.zip
-          unzip -l inspectai-ui-redesign.zip | head -30
-
       - name: Extract redesign
         run: |
+          rm -rf /tmp/inspectai
           mkdir -p /tmp/inspectai
+
+          echo "Checking ZIP..."
+          ls -lh inspectai-ui-redesign.zip
+
           unzip -q -o inspectai-ui-redesign.zip -d /tmp/inspectai
 
           ROOT=$(find /tmp/inspectai -name package.json -print -quit | xargs dirname)
 
           echo "Project root: $ROOT"
 
-          cp -R "$ROOT"/. .
+          if [ -z "$ROOT" ]; then
+            echo "ERROR: package.json not found"
+            exit 1
+          fi
+
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            "$ROOT/" ./
 
       - name: Commit redesigned project
         run: |
@@ -41,6 +48,6 @@ jobs:
 
           git add -A
 
-          git commit -m "Apply InspectAI UI redesign" || exit 0
+          git commit -m "Apply InspectAI UI redesign" || echo "No changes to commit"
 
           git push
